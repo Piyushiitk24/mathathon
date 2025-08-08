@@ -6,7 +6,8 @@
   ],
   "routes": [
     { "src": "^/api/(.*)$", "dest": "server/api/index.js" },
-    { "handle": "filesystem" },
-    { "src": ".*", "dest": "index.html" }
+    { "src": "^/static/(.*)$", "dest": "/static/$1" },
+    { "src": "^/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|txt|woff2|woff|ttf))$", "dest": "/$1" },
+    { "src": ".*", "dest": "/index.html" }
   ]
 }
