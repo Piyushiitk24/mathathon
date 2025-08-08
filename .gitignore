@@ -1,0 +1,67 @@
+# ---- Node & Package Managers ----
+node_modules/
+# lockfiles should be committed; do not ignore package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ---- Build Artifacts ----
+dist/
+build/
+.next/
+out/
+coverage/
+.nyc_output/
+.cache/
+.eslintcache
+.parcel-cache/
+.sass-cache/
+
+# ---- Environment & Secrets ----
+.env
+.env.*
+!.env.example
+!**/.env.example
+.envrc
+.direnv/
+.npmrc
+
+# ---- Databases & Local Data ----
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+# keep seed CSVs and fixtures tracked
+!**/*.csv
+
+# ---- Logs & PIDs ----
+logs/
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# ---- OS & Editor Junk ----
+.DS_Store
+.AppleDouble
+Thumbs.db
+.vscode/
+.idea/
+*.iml
+
+# ---- Runtime Temp ----
+tmp/
+temp/
+.cache-loader/
+
+# ---- Hosting/Deploy Artifacts ----
+.vercel/
+.netlify/
+.now/
+
+# ---- Images/Design Exports (optional) ----
+*.sketch
+*.fig
+*.psd
