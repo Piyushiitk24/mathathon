@@ -48,14 +48,15 @@ app.use((req, _res, next) => {
 });
 
 // Health and routes
+
 app.get('/health', (_req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString(), database: database.getType() });
 });
-app.use('/api/auth', authRoutes);
-app.use('/api/modules', modulesRoutes);
-app.use('/api/questions', questionsRoutes);
-app.use('/api/attempts', attemptsRoutes);
-app.use('/api/admin', adminRoutes);
+app.use('/auth', authRoutes);
+app.use('/modules', modulesRoutes);
+app.use('/questions', questionsRoutes);
+app.use('/attempts', attemptsRoutes);
+app.use('/admin', adminRoutes);
 
 app.use((req, res) => res.status(404).json({ error: 'Endpoint not found' }));
 
