@@ -21,15 +21,12 @@ class Database {
     try {
       this.client = new MongoClient(process.env.MONGODB_URI);
       await this.client.connect();
-      const dbName = process.env.MONGODB_DB_NAME || 'mathathon';
+      const dbName = process.env.MONGODB_DB_NAME || 'mathathon'; // make DB name configurable
       this.db = this.client.db(dbName);
       console.log(`Connected to MongoDB db="${dbName}"`);
-      
-      // Create indexes for better performance
       await this.db.collection('modules').createIndex({ slug: 1 }, { unique: true });
       await this.db.collection('users').createIndex({ username: 1 }, { unique: true });
       await this.db.collection('questions').createIndex({ module_id: 1, type: 1 });
-      
       return this.db;
     } catch (error) {
       console.error('MongoDB connection error:', error);
