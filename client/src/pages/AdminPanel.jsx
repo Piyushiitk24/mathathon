@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BarChart3, Users, FileText, TrendingUp, Calendar, Clock, Target } from 'lucide-react';
+import { ArrowLeft, BarChart3, Users, FileText, Calendar, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import AdminForms from '../components/AdminForms';
@@ -16,18 +16,9 @@ function AdminPanel() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    if (adminPassword && activeTab === 'attempts') {
-      loadAttempts();
-    }
-    if (adminPassword && activeTab === 'overview') {
-      loadStats();
-    }
-  }, [adminPassword, activeTab]);
-
-  const loadAttempts = async () => {
+  // Wrap loaders to satisfy exhaustive-deps
+  const loadAttempts = useCallback(async () => {
     if (!adminPassword) return;
-    
     setLoading(true);
     setError(null);
     try {
@@ -39,11 +30,10 @@ function AdminPanel() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [adminPassword]);
 
-  const loadStats = async () => {
+  const loadStats = useCallback(async () => {
     if (!adminPassword) return;
-    
     setLoading(true);
     setError(null);
     try {
@@ -55,13 +45,21 @@ function AdminPanel() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [adminPassword]);
+
+  useEffect(() => {
+    if (adminPassword && activeTab === 'attempts') {
+      loadAttempts();
+    }
+    if (adminPassword && activeTab === 'overview') {
+      loadStats();
+    }
+  }, [adminPassword, activeTab, loadAttempts, loadStats]);
 
   const handleAddQuestion = async (questionData) => {
     try {
       await adminAPI.addQuestion(questionData, adminPassword);
       alert('Question added successfully!');
-      // Refresh stats if we're on overview
       if (activeTab === 'overview') {
         loadStats();
       }

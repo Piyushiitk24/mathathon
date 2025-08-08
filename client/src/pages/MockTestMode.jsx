@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, ArrowLeft as PrevIcon, CheckCircle, Clock, Target } from 'lucide-react';
@@ -22,24 +22,16 @@ function MockTestMode({ user }) {
   const [error, setError] = useState(null);
   const [isStarted, setIsStarted] = useState(false);
 
-  useEffect(() => {
-    loadData();
-  }, [id]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      
-      // Load module and questions in parallel
       const [moduleResponse, questionsResponse] = await Promise.all([
         modulesAPI.getById(id),
         questionsAPI.getByModuleAndType(id, 'mock')
       ]);
-      
       setModule(moduleResponse.data);
       setQuestions(questionsResponse.data);
-      
       if (questionsResponse.data.length === 0) {
         setError('No mock test questions found for this module.');
       }
@@ -49,7 +41,11 @@ function MockTestMode({ user }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleStart = () => {
     setIsStarted(true);
@@ -64,12 +60,9 @@ function MockTestMode({ user }) {
     setAnswers(prev => {
       const existing = prev.find(a => a.qId === questionId);
       if (existing) {
-        return prev.map(a => 
-          a.qId === questionId ? { ...a, chosen: selectedOption } : a
-        );
-      } else {
-        return [...prev, { qId: questionId, chosen: selectedOption }];
+        return prev.map(a => (a.qId === questionId ? { ...a, chosen: selectedOption } : a));
       }
+      return [...prev, { qId: questionId, chosen: selectedOption }];
     });
   };
 
@@ -85,15 +78,10 @@ function MockTestMode({ user }) {
     }
   };
 
-  const handleJumpToQuestion = (index) => {
-    setCurrentIndex(index);
-  };
-
   const handleSubmit = async () => {
     const endTime = Date.now();
     const timeTakenSeconds = Math.floor((endTime - startTime) / 1000);
     const score = calculateScore(answers, questions);
-    
     const resultsData = {
       score,
       total: questions.length,
@@ -101,11 +89,8 @@ function MockTestMode({ user }) {
       timeTaken: timeTakenSeconds,
       answers
     };
-    
     setResults(resultsData);
     setIsFinished(true);
-    
-    // Record the attempt
     try {
       const attemptData = {
         username: user.username,
@@ -116,7 +101,6 @@ function MockTestMode({ user }) {
         time_taken_seconds: timeTakenSeconds,
         details: { answers }
       };
-      
       await attemptsAPI.create(attemptData);
       console.log('Mock test attempt recorded successfully');
     } catch (error) {
@@ -138,22 +122,17 @@ function MockTestMode({ user }) {
   };
 
   const getCelebrationMessage = (percentage) => {
-    if (percentage >= 90) return { emoji: '🏆', message: 'Outstanding! You\'re a math champion!' };
+    if (percentage >= 90) return { emoji: '🏆', message: "Outstanding! You're a math champion!" };
     if (percentage >= 80) return { emoji: '🎉', message: 'Excellent work! Keep it up!' };
-    if (percentage >= 70) return { emoji: '👏', message: 'Great job! You\'re doing well!' };
+    if (percentage >= 70) return { emoji: '👏', message: "Great job! You're doing well!" };
     if (percentage >= 60) return { emoji: '👍', message: 'Good effort! Keep practicing!' };
-    return { emoji: '💪', message: 'Keep learning! You\'ll get there!' };
+    return { emoji: '💪', message: "Keep learning! You'll get there!" };
   };
 
   if (loading) {
     return (
       <div className="min-h-screen pt-20 flex items-center justify-center">
-        <motion.div
-          className="text-center"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-        >
+        <motion.div className="text-center" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
           <div className="loading-spinner w-12 h-12 border-4 border-primary-orange border-t-transparent rounded-full mx-auto mb-4"></div>
           <h2 className="font-heading text-2xl text-gray-700">Loading mock test...</h2>
         </motion.div>
@@ -164,30 +143,15 @@ function MockTestMode({ user }) {
   if (error) {
     return (
       <div className="min-h-screen pt-20 flex items-center justify-center px-4">
-        <motion.div
-          className="text-center max-w-md"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-        >
+        <motion.div className="text-center max-w-md" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
           <div className="bg-red-100 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <span className="text-4xl">⚠️</span>
           </div>
           <h2 className="font-heading text-2xl text-gray-800 mb-2">Oops!</h2>
           <p className="font-body text-text-subtle mb-6">{error}</p>
           <div className="space-x-4">
-            <button
-              onClick={loadData}
-              className="bg-primary-orange text-white font-body font-semibold py-3 px-6 rounded-xl hover:bg-accent-orange transition-colors duration-200 btn-glow-orange"
-            >
-              Try Again
-            </button>
-            <button
-              onClick={handleBack}
-              className="bg-gray-600 text-white font-body font-semibold py-3 px-6 rounded-xl hover:bg-gray-700 transition-colors duration-200"
-            >
-              Go Back
-            </button>
+            <button onClick={loadData} className="bg-primary-orange text-white font-body font-semibold py-3 px-6 rounded-xl hover:bg-accent-orange transition-colors duration-200 btn-glow-orange">Try Again</button>
+            <button onClick={handleBack} className="bg-gray-600 text-white font-body font-semibold py-3 px-6 rounded-xl hover:bg-gray-700 transition-colors duration-200">Go Back</button>
           </div>
         </motion.div>
       </div>
@@ -201,29 +165,15 @@ function MockTestMode({ user }) {
     <div className="min-h-screen pt-20 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <motion.div
-          className="flex items-center justify-between mb-8"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <button
-            onClick={handleBack}
-            className="flex items-center space-x-2 text-text-subtle hover:text-gray-800 transition-colors duration-200"
-          >
+        <motion.div className="flex items-center justify-between mb-8" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <button onClick={handleBack} className="flex items-center space-x-2 text-text-subtle hover:text-gray-800 transition-colors duration-200">
             <ArrowLeft className="w-5 h-5" />
             <span className="font-body">Back to Modules</span>
           </button>
-          
           <div className="text-center">
-            <h1 className="font-heading text-3xl font-bold text-gray-800">
-              🎯 {module?.name} - Mock Test
-            </h1>
-            <p className="font-body text-text-subtle">
-              Test your knowledge • {questions.length} questions
-            </p>
+            <h1 className="font-heading text-3xl font-bold text-gray-800">🎯 {module?.name} - Mock Test</h1>
+            <p className="font-body text-text-subtle">Test your knowledge • {questions.length} questions</p>
           </div>
-          
           <div className="w-20"></div>
         </motion.div>
 

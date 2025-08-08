@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Play, Pause, RotateCcw, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Play, Pause, RotateCcw } from 'lucide-react';
 
 import QuestionCard from '../components/QuestionCard';
 import TimerHourglass from '../components/TimerHourglass';
@@ -22,7 +22,6 @@ function RevisionMode({ user }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fisher-Yates shuffle to randomize questions each session
   const shuffle = (arr) => {
     const a = [...arr];
     for (let i = a.length - 1; i > 0; i--) {
@@ -32,25 +31,17 @@ function RevisionMode({ user }) {
     return a;
   };
 
-  useEffect(() => {
-    loadData();
-  }, [id]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      
-      // Load module and questions in parallel
       const [moduleResponse, questionsResponse] = await Promise.all([
         modulesAPI.getById(id),
         questionsAPI.getByModuleAndType(id, 'revision')
       ]);
-      
       setModule(moduleResponse.data);
       const shuffled = shuffle(questionsResponse.data || []);
       setQuestions(shuffled);
-      
       if ((questionsResponse.data || []).length === 0) {
         setError('No revision questions found for this module.');
       }
@@ -60,7 +51,11 @@ function RevisionMode({ user }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleTimerComplete = () => {
     if (currentIndex < questions.length - 1) {
@@ -73,16 +68,9 @@ function RevisionMode({ user }) {
   const finishRevision = async () => {
     setIsPlaying(false);
     setIsFinished(true);
-    
     try {
-      const flashedData = questions.map(q => ({
-        id: q.id,
-        question_text: q.question_text,
-        answer_text: q.answer_text
-      }));
-      
+      const flashedData = questions.map(q => ({ id: q.id, question_text: q.question_text, answer_text: q.answer_text }));
       setFlashedQuestions(flashedData);
-      
       const attemptData = {
         username: user.username,
         module_id: parseInt(id),
@@ -90,7 +78,6 @@ function RevisionMode({ user }) {
         datetime_iso: new Date().toISOString(),
         details: { flashed_questions: flashedData }
       };
-      
       await attemptsAPI.create(attemptData);
     } catch (error) {
       console.error('Error recording revision attempt:', error);
@@ -118,12 +105,7 @@ function RevisionMode({ user }) {
   if (loading) {
     return (
       <div className="min-h-screen pt-20 flex items-center justify-center bg-grid bg-dots">
-        <motion.div
-          className="text-center"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-        >
+        <motion.div className="text-center" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
           <div className="loading-spinner w-12 h-12 border-4 border-neon-green border-t-transparent rounded-full mx-auto mb-4"></div>
           <h2 className="font-heading text-2xl text-charcoal uppercase tracking-widest">Loading revision content...</h2>
         </motion.div>
@@ -134,14 +116,9 @@ function RevisionMode({ user }) {
   if (error) {
     return (
       <div className="min-h-screen pt-20 flex items-center justify-center px-4 bg-grid bg-dots">
-        <motion.div
-          className="text-center max-w-md alert alert--error"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-        >
+        <motion.div className="text-center max-w-md alert alert--error" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
           <div className="bg-error w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 border-4 border-charcoal">
-            <span className="text-4xl text-white">⚠️</span>
+            <span className="text-4xl">⚠️</span>
           </div>
           <h2 className="font-heading text-2xl text-charcoal mb-2 uppercase tracking-widest">Oops!</h2>
           <p className="font-body text-text-subtle mb-6">{error}</p>
@@ -158,29 +135,15 @@ function RevisionMode({ user }) {
     <div className="min-h-screen pt-20 pb-12 bg-grid bg-dots">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <motion.div
-          className="flex items-center justify-between mb-8"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <button
-            onClick={handleBack}
-            className="flex items-center space-x-2 text-charcoal hover:text-deep-green-700 transition-colors duration-200"
-          >
+        <motion.div className="flex items-center justify-between mb-8" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <button onClick={handleBack} className="flex items-center space-x-2 text-charcoal hover:text-deep-green-700 transition-colors duration-200">
             <ArrowLeft className="w-5 h-5" />
             <span className="font-mono uppercase tracking-widest">Back to Modules</span>
           </button>
-          
           <div className="text-center">
-            <h1 className="font-heading text-3xl font-extrabold text-charcoal uppercase tracking-widest">
-              📚 {module?.name} - Study Mode
-            </h1>
-            <p className="font-body text-text-subtle">
-              Flash card revision • {questions.length} questions
-            </p>
+            <h1 className="font-heading text-3xl font-extrabold text-charcoal uppercase tracking-widest">📚 {module?.name} - Study Mode</h1>
+            <p className="font-body text-text-subtle">Flash card revision • {questions.length} questions</p>
           </div>
-          
           <div className="w-20"></div>
         </motion.div>
 
