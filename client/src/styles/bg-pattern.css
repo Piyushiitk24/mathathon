@@ -52,6 +52,11 @@
   box-shadow: 0 6px 0 #6B3D00, 0 0 18px rgba(255,140,26,0.4);
 }
 
+.btn-retro--green {
+  background: linear-gradient(180deg, #00ff41 0%, #00CC33 100%);
+  box-shadow: 0 6px 0 #0B2F24, 0 0 18px rgba(0,255,65,0.4);
+}
+
 /* Alerts */
 .alert {
   border-left: 6px solid #00ff41;

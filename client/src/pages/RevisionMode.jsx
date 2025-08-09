@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Play, Pause, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Play, Pause, RotateCcw, CheckCircle } from 'lucide-react';
 
 import QuestionCard from '../components/QuestionCard';
 import TimerHourglass from '../components/TimerHourglass';
 import { questionsAPI, attemptsAPI, modulesAPI } from '../api/api';
 
-const QUESTION_DURATION = 25; // seconds per question
+const QUESTION_DURATION = 20; // seconds per question
 
 function RevisionMode({ user }) {
   const { id } = useParams();
@@ -18,7 +18,7 @@ function RevisionMode({ user }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
-  const [flashedQuestions, setFlashedQuestions] = useState([]);
+  const [sessionQuestions, setSessionQuestions] = useState([]); // Track the exact sequence shown
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -57,6 +57,13 @@ function RevisionMode({ user }) {
     loadData();
   }, [loadData]);
 
+  const handleStart = () => {
+    setIsPlaying(true);
+    setCurrentIndex(0);
+    setIsFinished(false);
+    setSessionQuestions([...questions]); // Store the exact sequence for this session
+  };
+
   const handleTimerComplete = () => {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(prev => prev + 1);
@@ -68,15 +75,23 @@ function RevisionMode({ user }) {
   const finishRevision = async () => {
     setIsPlaying(false);
     setIsFinished(true);
+    
     try {
-      const flashedData = questions.map(q => ({ id: q.id, question_text: q.question_text, answer_text: q.answer_text }));
-      setFlashedQuestions(flashedData);
+      // Record the attempt with the exact sequence shown to the student
       const attemptData = {
         username: user.username,
-        module_id: parseInt(id),
+        module_id: id, // Keep as string (ObjectId)
         type: 'revision',
         datetime_iso: new Date().toISOString(),
-        details: { flashed_questions: flashedData }
+        details: { 
+          questions_sequence: sessionQuestions.map(q => ({ 
+            id: q.id, 
+            question_text: q.question_text, 
+            answer_text: q.answer_text 
+          })),
+          questions_viewed: questions.length,
+          total_questions: questions.length
+        }
       };
       await attemptsAPI.create(attemptData);
     } catch (error) {
@@ -84,20 +99,40 @@ function RevisionMode({ user }) {
     }
   };
 
-  const handleStart = () => {
-    setIsPlaying(true);
-    setCurrentIndex(0);
-    setIsFinished(false);
-    setFlashedQuestions([]);
-  };
-
   const handlePause = () => setIsPlaying(false);
+
+  const handleSubmit = async () => {
+    setIsPlaying(false);
+    setIsFinished(true);
+    
+    try {
+      // Record the attempt with the exact sequence shown to the student
+      const attemptData = {
+        username: user.username,
+        module_id: id, // Keep as string (ObjectId)
+        type: 'revision',
+        datetime_iso: new Date().toISOString(),
+        details: { 
+          questions_sequence: sessionQuestions.slice(0, currentIndex + 1).map(q => ({ 
+            id: q.id, 
+            question_text: q.question_text, 
+            answer_text: q.answer_text 
+          })),
+          questions_viewed: currentIndex + 1,
+          total_questions: questions.length
+        }
+      };
+      await attemptsAPI.create(attemptData);
+    } catch (error) {
+      console.error('Error recording revision attempt:', error);
+    }
+  };
 
   const handleReset = () => {
     setIsPlaying(false);
     setCurrentIndex(0);
     setIsFinished(false);
-    setFlashedQuestions([]);
+    setSessionQuestions([]);
   };
 
   const handleBack = () => navigate('/');
@@ -175,7 +210,7 @@ function RevisionMode({ user }) {
           </motion.div>
         )}
 
-        {isPlaying && (
+        {isPlaying && !isFinished && (
           <div className="space-y-8">
             <motion.div
               className="flex flex-col lg:flex-row items-center justify-between space-y-4 lg:space-y-0"
@@ -208,6 +243,12 @@ function RevisionMode({ user }) {
                 <button onClick={handlePause} className="btn-retro btn-retro--orange p-3">
                   <Pause className="w-5 h-5 text-charcoal" />
                 </button>
+                
+                <button onClick={handleSubmit} className="btn-retro btn-retro--green flex items-center space-x-2 px-4 py-3">
+                  <CheckCircle className="w-5 h-5 text-charcoal" />
+                  <span className="font-mono uppercase tracking-widest text-xs">Submit Early</span>
+                </button>
+                
                 <button onClick={handleReset} className="btn-retro p-3">
                   <RotateCcw className="w-5 h-5 text-charcoal" />
                 </button>
@@ -219,6 +260,8 @@ function RevisionMode({ user }) {
                 <QuestionCard
                   key={currentIndex}
                   question={questions[currentIndex]}
+                  showAnswer={true}
+                  showQuestionText={true}
                   isVisible={true}
                 />
               )}
@@ -239,8 +282,8 @@ function RevisionMode({ user }) {
                 Revision Complete!
               </h2>
               <p className="font-body text-text-subtle mb-6">
-                Great job! You've reviewed all {questions.length} questions. 
-                Here's a complete summary with answers.
+                Great job! You've reviewed {isPlaying ? questions.length : currentIndex + 1} of {questions.length} questions. 
+                Here's a summary with answers in the exact sequence you saw them.
               </p>
               
               <div className="flex justify-center space-x-4">
@@ -254,7 +297,10 @@ function RevisionMode({ user }) {
                 📖 Complete Review
               </h3>
               
-              {flashedQuestions.map((question, index) => (
+              {(isFinished && sessionQuestions.length > 0 ? 
+                sessionQuestions.slice(0, currentIndex + 1) : 
+                sessionQuestions
+              ).map((question, index) => (
                 <motion.div
                   key={question.id}
                   className="panel p-6 border-neon-green"
