@@ -20,19 +20,65 @@ class Question {
     } = questionData;
 
     if (type === 'mongodb') {
-      const result = await db.collection('questions').insertOne({
-        module_id,
+      const { ObjectId } = require('mongodb');
+      
+      // Ensure module_id is properly converted to ObjectId
+      let moduleObjectId;
+      try {
+        if (typeof module_id === 'string' && ObjectId.isValid(module_id)) {
+          moduleObjectId = new ObjectId(module_id);
+        } else if (module_id instanceof ObjectId) {
+          moduleObjectId = module_id;
+        } else {
+          throw new Error('Invalid module_id format');
+        }
+      } catch (error) {
+        console.error('ObjectId conversion error:', error);
+        throw new Error(`Invalid module_id: ${module_id}`);
+      }
+
+      // Create clean document with proper field validation
+      const documentToInsert = {
+        module_id: moduleObjectId,
         type: questionType,
-        question_text,
-        option_a,
-        option_b,
-        option_c,
-        option_d,
-        correct_option,
-        answer_text,
-        difficulty
-      });
-      return { id: result.insertedId, ...questionData };
+        question_text: question_text,
+        difficulty: difficulty || 'medium'
+      };
+
+      // Only add option fields for mock questions
+      if (questionType === 'mock') {
+        documentToInsert.option_a = option_a || null;
+        documentToInsert.option_b = option_b || null;
+        documentToInsert.option_c = option_c || null;
+        documentToInsert.option_d = option_d || null;
+        documentToInsert.correct_option = correct_option || null;
+      } else {
+        // For revision questions, ensure these fields are null
+        documentToInsert.option_a = null;
+        documentToInsert.option_b = null;
+        documentToInsert.option_c = null;
+        documentToInsert.option_d = null;
+        documentToInsert.correct_option = null;
+      }
+
+      // Always include answer_text
+      documentToInsert.answer_text = answer_text || null;
+
+      try {
+        console.log('Attempting to insert document:', JSON.stringify(documentToInsert, null, 2));
+        const result = await db.collection('questions').insertOne(documentToInsert);
+        console.log('Insert successful, result:', result);
+        return { id: result.insertedId, ...questionData };
+      } catch (mongoError) {
+        console.error('MongoDB Insert Error Details:', {
+          message: mongoError.message,
+          code: mongoError.code,
+          codeName: mongoError.codeName,
+          writeErrors: mongoError.writeErrors,
+          document: documentToInsert
+        });
+        throw new Error(`Database insert failed: ${mongoError.message}`);
+      }
     } else {
       return new Promise((resolve, reject) => {
         const sql = `INSERT INTO questions 

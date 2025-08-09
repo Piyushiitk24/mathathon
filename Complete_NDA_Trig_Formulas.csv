@@ -51,10 +51,13 @@ Serial Number,Question,Answer
 50,$\cos^2(A)$,$\frac{1+\cos(2A)}{2}$
 51,$\sin\left(\frac{A}{2}\right)$,$\pm\sqrt{\frac{1-\cos(A)}{2}}$
 52,$\cos\left(\frac{A}{2}\right)$,$\pm\sqrt{\frac{1+\cos(A)}{2}}$
-53,$\tan\left(\frac{A}{2}\right)$,$\frac{\sin(A)}{1+\cos(A)} = \frac{1-\cos(A)}{\sin(A)} = \pm\sqrt{\frac{1-\cos(A)}{1+\cos(A)}}$
+53,$\tan\left(\frac{A}{2}\right)$,$\frac{\sin(A)}{1+\cos(A)} = \frac{1-\cos(A)}{\sin(A)}$
 54,$\sin(A)\sin(B)$,$\frac{1}{2}\left[\cos(A-B) - \cos(A+B)\right]$
 55,$\cos(A)\cos(B)$,$\frac{1}{2}\left[\cos(A-B) + \cos(A+B)\right]$
 56,$\sin(A)\cos(B)$,$\frac{1}{2}\left[\sin(A+B) + \sin(A-B)\right]$
 57,$\cos(A)\sin(B)$,$\frac{1}{2}\left[\sin(A+B) - \sin(A-B)\right]$
-58,$\frac{a}{\sin(A)} = \frac{b}{\sin(B)} = \frac{c}{\sin(C)}$,"Law of Sines"
-59,$a^2 = b^2 + c^2 - 2bc\cos(A)$,"Law of Cosines"
+58,$\frac{a}{\sin(A)} = \frac{b}{\sin(B)} = \frac{c}{\sin(C)}$,$\text{Law of Sines}$
+59,$a^2 = b^2 + c^2 - 2bc\cos(A)$,$\text{Law of Cosines}$
+60,$\sin(90° - A)$,$\cos(A)$
+61,$\cos(90° - A)$,$\sin(A)$
+62,$\tan(90° - A)$,$\cot(A)$

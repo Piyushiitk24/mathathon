@@ -44,13 +44,31 @@ const adminController = {
         });
       }
 
+      if (!['revision', 'mock'].includes(type)) {
+        return res.status(400).json({ 
+          error: 'Type must be "revision" or "mock"' 
+        });
+      }
+
       // Find or create module
       const moduleSlug = module_name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-      const module = await Module.create(module_name, moduleSlug);
+      let module = await Module.findBySlug(moduleSlug);
+      
+      if (!module) {
+        module = await Module.create(module_name, moduleSlug);
+      }
 
-      // Create question data
+      // Ensure module.id is properly formatted for ObjectId conversion
+      let moduleId = module.id;
+      if (typeof moduleId === 'object' && moduleId._id) {
+        moduleId = moduleId._id.toString(); // Extract ObjectId if it's wrapped
+      } else if (typeof moduleId === 'object') {
+        moduleId = moduleId.toString(); // Convert ObjectId to string
+      }
+
+      // Create question data with proper module_id
       const questionData = {
-        module_id: module.id,
+        module_id: moduleId, // This should be an ObjectId string
         type,
         question_text,
         option_a: option_a || null,
@@ -62,16 +80,28 @@ const adminController = {
         difficulty: difficulty || 'medium'
       };
 
+      console.log('Creating question with data:', {
+        ...questionData,
+        module_id: moduleId // Log the string representation
+      });
+
       const question = await Question.create(questionData);
       
       res.status(201).json({ 
         ok: true, 
         question,
-        module: module
+        module: {
+          id: moduleId,
+          name: module.name || module_name,
+          slug: moduleSlug
+        }
       });
     } catch (error) {
       console.error('Error adding question:', error);
-      res.status(500).json({ error: 'Failed to add question' });
+      res.status(500).json({ 
+        error: `Failed to add question: ${error.message}`,
+        details: error.stack
+      });
     }
   },
 
