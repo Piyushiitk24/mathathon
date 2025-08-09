@@ -48,12 +48,12 @@ app.use((req, _res, next) => {
 });
 
 // Health and test routes
-app.get('/health', (_req, res) => {
+app.get('/api/health', (_req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString(), database: database.getType() });
 });
 
 // Test endpoint for debugging
-app.get('/test', (req, res) => {
+app.get('/api/test', (req, res) => {
   res.json({ 
     message: 'API is working!',
     path: req.path,
@@ -64,11 +64,11 @@ app.get('/test', (req, res) => {
   });
 });
 
-app.use('/auth', authRoutes);
-app.use('/modules', modulesRoutes);
-app.use('/questions', questionsRoutes);
-app.use('/attempts', attemptsRoutes);
-app.use('/admin', adminRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/modules', modulesRoutes);
+app.use('/api/questions', questionsRoutes);
+app.use('/api/attempts', attemptsRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.use((req, res) => res.status(404).json({ error: 'Endpoint not found' }));
 
