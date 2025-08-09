@@ -2,6 +2,7 @@ const database = require('../db');
 
 class Module {
   static async create(name, slug) {
+    await database.connect(); // Ensure connection before accessing DB
     const db = database.getDb();
     const type = database.getType();
 
@@ -34,6 +35,7 @@ class Module {
   }
 
   static async findAll() {
+    await database.connect(); // Ensure connection before accessing DB
     const db = database.getDb();
     const type = database.getType();
 
@@ -54,6 +56,7 @@ class Module {
   }
 
   static async findBySlug(slug) {
+    await database.connect(); // Ensure connection before accessing DB
     const db = database.getDb();
     const type = database.getType();
 
@@ -74,6 +77,7 @@ class Module {
   }
 
   static async findById(id) {
+    await database.connect(); // Ensure connection before accessing DB
     const db = database.getDb();
     const type = database.getType();
 

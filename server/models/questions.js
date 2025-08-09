@@ -2,6 +2,7 @@ const database = require('../db');
 
 class Question {
   static async create(questionData) {
+    await database.connect(); // Ensure connection before accessing DB
     const db = database.getDb();
     const type = database.getType();
 
@@ -52,6 +53,7 @@ class Question {
   }
 
   static async findByModuleAndType(moduleId, questionType) {
+    await database.connect(); // Ensure connection before accessing DB
     const db = database.getDb();
     const type = database.getType();
 
@@ -89,6 +91,7 @@ class Question {
   }
 
   static async findById(id) {
+    await database.connect(); // Ensure connection before accessing DB
     const db = database.getDb();
     const type = database.getType();
 
@@ -122,6 +125,7 @@ class Question {
   }
 
   static async count() {
+    await database.connect(); // Ensure connection before accessing DB
     const db = database.getDb();
     const type = database.getType();
 
