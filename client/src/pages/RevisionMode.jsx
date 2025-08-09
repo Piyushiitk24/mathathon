@@ -8,7 +8,7 @@ import TimerHourglass from '../components/TimerHourglass';
 import MathText from '../components/MathText';
 import { questionsAPI, attemptsAPI, modulesAPI } from '../api/api';
 
-const QUESTION_DURATION = 20; // seconds per question
+const QUESTION_DURATION = 10; // seconds per question
 
 function RevisionMode({ user }) {
   const { id } = useParams();
