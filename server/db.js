@@ -2,6 +2,10 @@ const sqlite3 = require('sqlite3').verbose();
 const { MongoClient } = require('mongodb');
 const path = require('path');
 
+// These variables will hold the single, shared connection promise and database instance.
+let connectionPromise = null;
+let dbInstance = null;
+
 class Database {
   constructor() {
     this.type = process.env.MONGODB_URI && process.env.MONGODB_URI.trim() ? 'mongodb' : 'sqlite';
@@ -18,20 +22,37 @@ class Database {
   }
 
   async connectMongo() {
-    try {
-      this.client = new MongoClient(process.env.MONGODB_URI);
-      await this.client.connect();
-      const dbName = process.env.MONGODB_DB_NAME || 'mathathon'; // make DB name configurable
-      this.db = this.client.db(dbName);
-      console.log(`Connected to MongoDB db="${dbName}"`);
-      await this.db.collection('modules').createIndex({ slug: 1 }, { unique: true });
-      await this.db.collection('users').createIndex({ username: 1 }, { unique: true });
-      await this.db.collection('questions').createIndex({ module_id: 1, type: 1 });
-      return this.db;
-    } catch (error) {
-      console.error('MongoDB connection error:', error);
-      throw error;
+    // If a connection promise already exists, return it to avoid creating multiple connections.
+    if (connectionPromise) {
+      return connectionPromise;
     }
+
+    // Otherwise, create a new connection promise.
+    connectionPromise = new Promise(async (resolve, reject) => {
+      const mongoUri = process.env.MONGODB_URI;
+      const dbName = process.env.MONGODB_DB_NAME || 'mathathon';
+
+      if (!mongoUri) {
+        console.error('💥 MONGODB_URI is not defined in environment variables');
+        return reject(new Error('MONGODB_URI is not defined'));
+      }
+
+      const client = new MongoClient(mongoUri);
+
+      client.connect()
+        .then(connectedClient => {
+          console.log(`✅ Database connected successfully to "${dbName}"`);
+          dbInstance = connectedClient.db(dbName); // Store the database instance
+          resolve(dbInstance);
+        })
+        .catch(err => {
+          console.error('💥 Failed to connect to database:', err);
+          connectionPromise = null; // Reset promise on failure to allow retry
+          reject(err);
+        });
+    });
+
+    return connectionPromise;
   }
 
   async connectSQLite() {
@@ -106,6 +127,12 @@ class Database {
   }
 
   getDb() {
+    if (this.type === 'mongodb') {
+      if (!dbInstance) {
+        throw new Error('Database not connected. Call connect() and wait for it to resolve first.');
+      }
+      return dbInstance;
+    }
     return this.db;
   }
 

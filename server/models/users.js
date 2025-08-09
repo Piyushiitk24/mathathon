@@ -1,40 +1,26 @@
-const database = require('../db');
+const { connect, getDb } = require('../db');
 
-class User {
-  static async create(username) {
-    const db = database.getDb();
-    const type = database.getType();
-
-    if (type === 'mongodb') {
-      try {
-        const result = await db.collection('users').insertOne({ username });
-        return { id: result.insertedId, username };
-      } catch (error) {
-        if (error.code === 11000) { // Duplicate key error
-          return await this.findByUsername(username);
-        }
-        throw error;
-      }
-    } else {
-      return new Promise((resolve, reject) => {
-        db.run('INSERT OR IGNORE INTO users (username) VALUES (?)', [username], function(err) {
-          if (err) {
-            reject(err);
-          } else {
-            if (this.changes > 0) {
-              resolve({ id: this.lastID, username });
-            } else {
-              // User already exists, fetch it
-              User.findByUsername(username).then(resolve).catch(reject);
-            }
-          }
-        });
-      });
+const User = {
+  async create(username) {
+    // First, ensure the database is connected by calling connect()
+    await connect(); 
+    // Now, it's safe to get the database instance.
+    const db = getDb();
+    const usersCollection = db.collection('users');
+    
+    // Find user or create if they don't exist
+    const existingUser = await usersCollection.findOne({ username });
+    if (existingUser) {
+      return existingUser;
     }
-  }
+    
+    const newUser = { username, createdAt: new Date() };
+    await usersCollection.insertOne(newUser);
+    return newUser;
+  },
 
   static async findByUsername(username) {
-    const db = database.getDb();
+    const db = getDb();
     const type = database.getType();
 
     if (type === 'mongodb') {
@@ -51,10 +37,10 @@ class User {
         });
       });
     }
-  }
+  },
 
   static async findAll() {
-    const db = database.getDb();
+    const db = getDb();
     const type = database.getType();
 
     if (type === 'mongodb') {
@@ -72,6 +58,6 @@ class User {
       });
     }
   }
-}
+};
 
 module.exports = User;

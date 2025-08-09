@@ -75,8 +75,11 @@ app.use((req, res) => res.status(404).json({ error: 'Endpoint not found' }));
 // Start database and (only locally) the HTTP listener
 async function startServer() {
   try {
+    // This line ensures the connection process begins when the serverless function starts.
     await database.connect();
-    console.log(`✅ Database (${database.getType()}) connected successfully`);
+    console.log('Database connection process initiated.'); // New log message
+    
+    // This part only runs on your local machine, not on Vercel.
     if (!process.env.VERCEL) {
       app.listen(PORT, () => console.log(`🚀 Server http://localhost:${PORT}`));
     }
