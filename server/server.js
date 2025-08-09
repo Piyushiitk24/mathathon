@@ -77,7 +77,7 @@ async function startServer() {
   try {
     // This line ensures the connection process begins when the serverless function starts.
     await database.connect();
-    console.log('Database connection process initiated.'); // New log message
+    console.log('Database connection process initiated.');
     
     // This part only runs on your local machine, not on Vercel.
     if (!process.env.VERCEL) {

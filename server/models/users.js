@@ -17,7 +17,7 @@ const User = {
     const newUser = { username, createdAt: new Date() };
     await usersCollection.insertOne(newUser);
     return newUser;
-  }
+  },
 };
 
 module.exports = User;
