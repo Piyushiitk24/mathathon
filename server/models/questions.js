@@ -58,10 +58,22 @@ class Question {
     const type = database.getType();
 
     if (type === 'mongodb') {
+      const { ObjectId } = require('mongodb');
+      
+      // Convert moduleId to ObjectId if it's a valid ObjectId string
+      let searchModuleId = moduleId;
+      if (typeof moduleId === 'string' && ObjectId.isValid(moduleId)) {
+        searchModuleId = new ObjectId(moduleId);
+      }
+      
+      console.log(`🔍 MongoDB search: module_id=${searchModuleId}, type=${questionType}`);
+      
       const questions = await db.collection('questions').find({
-        module_id: moduleId,
+        module_id: searchModuleId,
         type: questionType
       }).toArray();
+      
+      console.log(`📚 MongoDB found ${questions.length} questions`);
       
       return questions.map(q => ({
         id: q._id,

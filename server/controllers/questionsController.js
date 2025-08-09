@@ -10,7 +10,9 @@ const questionsController = {
         return res.status(400).json({ error: 'Invalid question type. Must be "revision" or "mock"' });
       }
       
-      const questions = await Question.findByModuleAndType(parseInt(moduleId), type);
+      console.log(`🔍 Searching for questions with moduleId: ${moduleId}, type: ${type}`);
+      const questions = await Question.findByModuleAndType(moduleId, type);
+      console.log(`📚 Found ${questions.length} questions`);
       res.json(questions);
     } catch (error) {
       console.error('Error fetching questions:', error);
@@ -80,7 +82,7 @@ const questionsController = {
       }
 
       const questionData = {
-        module_id: parseInt(module_id),
+        module_id: module_id, // Keep as string/ObjectId, don't parse as int
         type,
         question_text,
         option_a: option_a || null,
