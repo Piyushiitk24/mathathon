@@ -41,17 +41,29 @@ if (process.env.MONGODB_URI && process.env.MONGODB_URI.trim()) {
 }
 app.use(session(sessionOptions));
 
-// Logging (optional)
+// Enhanced logging for debugging
 app.use((req, _res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path} | originalUrl: ${req.originalUrl} | url: ${req.url}`);
   next();
 });
 
-// Health and routes
-
+// Health and test routes
 app.get('/health', (_req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString(), database: database.getType() });
 });
+
+// Test endpoint for debugging
+app.get('/test', (req, res) => {
+  res.json({ 
+    message: 'API is working!',
+    path: req.path,
+    originalUrl: req.originalUrl,
+    url: req.url,
+    method: req.method,
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.use('/auth', authRoutes);
 app.use('/modules', modulesRoutes);
 app.use('/questions', questionsRoutes);
