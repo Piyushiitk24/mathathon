@@ -5,6 +5,7 @@ import { ArrowLeft, Play, Pause, RotateCcw, CheckCircle, ChevronRight } from 'lu
 
 import QuestionCard from '../components/QuestionCard';
 import TimerHourglass from '../components/TimerHourglass';
+import MathText from '../components/MathText';
 import { questionsAPI, attemptsAPI, modulesAPI } from '../api/api';
 
 const QUESTION_DURATION = 20; // seconds per question
@@ -322,11 +323,13 @@ function RevisionMode({ user }) {
                     </div>
                     <div className="flex-1">
                       <div className="math-expression font-body text-lg text-charcoal mb-3">
-                        <strong>Q:</strong> {question.question_text}
+                        <strong>Q: </strong>
+                        <MathText text={question.question_text} />
                       </div>
                       {question.answer_text && (
                         <div className="math-expression font-body text-lg text-charcoal bg-paper p-3 rounded-lg border-2 border-neon-green">
-                          <strong>A:</strong> {question.answer_text}
+                          <strong>A: </strong>
+                          <MathText text={question.answer_text} />
                         </div>
                       )}
                     </div>
