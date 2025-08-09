@@ -1,0 +1,60 @@
+Serial Number,Question,Answer
+1,$\sin^2(A) + \cos^2(A)$,$1$
+2,$1 + \tan^2(A)$,$\sec^2(A)$
+3,$\sec^2(A) - \tan^2(A)$,$1$
+4,$1 + \cot^2(A)$,$\csc^2(A)$
+5,$\csc^2(A) - \cot^2(A)$,$1$
+6,$\sec(A) + \tan(A)$,$\frac{1}{\sec(A) - \tan(A)}$
+7,$\csc(A) + \cot(A)$,$\frac{1}{\csc(A) - \cot(A)}$
+8,$\sin(2A)$,$2\sin(A)\cos(A)$
+9,$\sin(2A)$,$\frac{2\tan(A)}{1 + \tan^2(A)}$
+10,$\cos(2A)$,$\cos^2(A) - \sin^2(A)$
+11,$\cos(2A)$,$2\cos^2(A) - 1$
+12,$\cos(2A)$,$1 - 2\sin^2(A)$
+13,$\cos(2A)$,$\frac{1 - \tan^2(A)}{1 + \tan^2(A)}$
+14,$\tan(2A)$,$\frac{2\tan(A)}{1 - \tan^2(A)}$
+15,$1 + \cos(2A)$,$2\cos^2(A)$
+16,$1 - \cos(2A)$,$2\sin^2(A)$
+17,$\sin(A) + \cos(A)$,$\sqrt{1 + \sin(2A)}$
+18,$\tan(A) + \cot(A)$,$\frac{2}{\sin(2A)}$
+19,$\sin(3A)$,$3\sin(A) - 4\sin^3(A)$
+20,$\cos(3A)$,$4\cos^3(A) - 3\cos(A)$
+21,$\tan(3A)$,$\frac{3\tan(A) - \tan^3(A)}{1 - 3\tan^2(A)}$
+22,$\sin(A+B)$,$\sin(A)\cos(B) + \cos(A)\sin(B)$
+23,$\sin(A-B)$,$\sin(A)\cos(B) - \cos(A)\sin(B)$
+24,$\cos(A+B)$,$\cos(A)\cos(B) - \sin(A)\sin(B)$
+25,$\cos(A-B)$,$\cos(A)\cos(B) + \sin(A)\sin(B)$
+26,$\tan(A+B)$,$\frac{\tan(A) + \tan(B)}{1 - \tan(A)\tan(B)}$
+27,$\tan(A-B)$,$\frac{\tan(A) - \tan(B)}{1 + \tan(A)\tan(B)}$
+28,$\cot(A+B)$,$\frac{\cot(A)\cot(B) - 1}{\cot(A) + \cot(B)}$
+29,$\cot(A-B)$,$\frac{\cot(A)\cot(B) + 1}{\cot(B) - \cot(A)}$
+30,$\sin(A+B)\sin(A-B)$,$\sin^2(A) - \sin^2(B)$
+31,$\sin(A+B)\sin(A-B)$,$\cos^2(B) - \cos^2(A)$
+32,$\cos(A+B)\cos(A-B)$,$\cos^2(A) - \sin^2(B)$
+33,$\cos(A+B)\cos(A-B)$,$\cos^2(B) - \sin^2(A)$
+34,$\sin(A) + \sin(B)$,$2\sin\left(\frac{A+B}{2}\right)\cos\left(\frac{A-B}{2}\right)$
+35,$\sin(A) - \sin(B)$,$2\sin\left(\frac{A-B}{2}\right)\cos\left(\frac{A+B}{2}\right)$
+36,$\cos(A) + \cos(B)$,$2\cos\left(\frac{A+B}{2}\right)\cos\left(\frac{A-B}{2}\right)$
+37,$\cos(A) - \cos(B)$,$-2\sin\left(\frac{A+B}{2}\right)\sin\left(\frac{A-B}{2}\right)$
+38,$\tan(A) + \tan(B)$,$\frac{\sin(A+B)}{\cos(A)\cos(B)}$
+39,$\tan(A) - \tan(B)$,$\frac{\sin(A-B)}{\cos(A)\cos(B)}$
+40,$\cot(A) + \cot(B)$,$\frac{\sin(A+B)}{\sin(A)\sin(B)}$
+41,$\cot(A) - \cot(B)$,$\frac{\sin(B-A)}{\sin(A)\sin(B)}$
+42,$2\sin(A)\cos(B)$,$\sin(A+B) + \sin(A-B)$
+43,$2\cos(A)\sin(B)$,$\sin(A+B) - \sin(A-B)$
+44,$2\cos(A)\cos(B)$,$\cos(A+B) + \cos(A-B)$
+45,$2\sin(A)\sin(B)$,$\cos(A-B) - \cos(A+B)$
+46,$\frac{1 - \cos(A)}{\sin(A)}$,$\tan\left(\frac{A}{2}\right)$
+47,$\frac{1 + \cos(A)}{1 - \cos(A)}$,$\cot^2\left(\frac{A}{2}\right)$
+48,$\frac{1 - \cos(A)}{1 + \cos(A)}$,$\tan^2\left(\frac{A}{2}\right)$
+49,$\sin^2(A)$,$\frac{1-\cos(2A)}{2}$
+50,$\cos^2(A)$,$\frac{1+\cos(2A)}{2}$
+51,$\sin\left(\frac{A}{2}\right)$,$\pm\sqrt{\frac{1-\cos(A)}{2}}$
+52,$\cos\left(\frac{A}{2}\right)$,$\pm\sqrt{\frac{1+\cos(A)}{2}}$
+53,$\tan\left(\frac{A}{2}\right)$,$\frac{\sin(A)}{1+\cos(A)} = \frac{1-\cos(A)}{\sin(A)} = \pm\sqrt{\frac{1-\cos(A)}{1+\cos(A)}}$
+54,$\sin(A)\sin(B)$,$\frac{1}{2}[\cos(A-B) - \cos(A+B)]$
+55,$\cos(A)\cos(B)$,$\frac{1}{2}[\cos(A-B) + \cos(A+B)]$
+56,$\sin(A)\cos(B)$,$\frac{1}{2}[\sin(A+B) + \sin(A-B)]$
+57,$\cos(A)\sin(B)$,$\frac{1}{2}[\sin(A+B) - \sin(A-B)]$
+58,$\frac{a}{\sin(A)} = \frac{b}{\sin(B)} = \frac{c}{\sin(C)}$,Law of Sines
+59,$a^2 = b^2 + c^2 - 2bc\cos(A)$,Law of Cosines
