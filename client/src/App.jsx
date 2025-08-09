@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Analytics } from '@vercel/analytics/react';
 
 // Import pages
 import Login from './pages/Login';
@@ -136,6 +137,9 @@ function App() {
             />
           </Routes>
         </AnimatePresence>
+        
+        {/* Vercel Analytics */}
+        <Analytics />
       </div>
     </Router>
   );
