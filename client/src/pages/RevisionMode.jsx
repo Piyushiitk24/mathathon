@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Play, Pause, RotateCcw, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Play, Pause, RotateCcw, CheckCircle, ChevronRight } from 'lucide-react';
 
 import QuestionCard from '../components/QuestionCard';
 import TimerHourglass from '../components/TimerHourglass';
@@ -64,12 +64,16 @@ function RevisionMode({ user }) {
     setSessionQuestions([...questions]); // Store the exact sequence for this session
   };
 
-  const handleTimerComplete = () => {
+  const handleNext = () => {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(prev => prev + 1);
     } else {
       finishRevision();
     }
+  };
+
+  const handleTimerComplete = () => {
+    handleNext(); // Use the same logic as manual next
   };
 
   const finishRevision = async () => {
@@ -244,6 +248,10 @@ function RevisionMode({ user }) {
                   <Pause className="w-5 h-5 text-charcoal" />
                 </button>
                 
+                <button onClick={handleNext} className="btn-retro p-3">
+                  <ChevronRight className="w-5 h-5 text-charcoal" />
+                </button>
+                
                 <button onClick={handleSubmit} className="btn-retro btn-retro--green flex items-center space-x-2 px-4 py-3">
                   <CheckCircle className="w-5 h-5 text-charcoal" />
                   <span className="font-mono uppercase tracking-widest text-xs">Submit Early</span>
@@ -260,7 +268,7 @@ function RevisionMode({ user }) {
                 <QuestionCard
                   key={currentIndex}
                   question={questions[currentIndex]}
-                  showAnswer={true}
+                  showAnswer={false}
                   showQuestionText={true}
                   isVisible={true}
                 />
